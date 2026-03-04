@@ -6,6 +6,7 @@ import { CronModule } from './cron/cron.module';
 import { FibonacciModule } from './fibonacci/fibonacci.module';
 import { HttpClientModule } from './http-client/http-client.module';
 import { SchedulerModule } from './scheduler/scheduler.module';
+import { TagsModule } from './tags/tags.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { SchedulerModule } from './scheduler/scheduler.module';
     SchedulerModule,
     FibonacciModule,
     HttpClientModule,
+    TagsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
