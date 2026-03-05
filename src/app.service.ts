@@ -1,8 +1,12 @@
+import { I18nService } from '@/i18n/i18n.service';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class AppService {
-  getHello(): string {
-    return 'Hello World!';
-  }
+	constructor(private readonly i18nService: I18nService) {}
+	getHello(): string {
+		return this.i18nService.translate('ERRORS.USER_NOT_FOUND', {
+			firstName: 'Kamil',
+		});
+	}
 }
