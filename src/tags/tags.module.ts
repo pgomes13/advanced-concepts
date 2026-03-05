@@ -1,5 +1,5 @@
 import { Module, OnApplicationBootstrap } from '@nestjs/common';
-import { ContextIdFactory, ModuleRef } from '@nestjs/core';
+import { ModuleRef } from '@nestjs/core';
 import { TagsController } from './tags.controller';
 import { TagsService } from './tags.service';
 
@@ -12,14 +12,14 @@ export class TagsModule implements OnApplicationBootstrap {
 
 	async onApplicationBootstrap() {
 		// ⚠️ Make sure to comment out everything inside this method, before continuing onto later lessons ⚠️
-		const contextId = ContextIdFactory.create();
-		this.moduleRef.registerRequestByContextId({ hello: 'world' }, contextId);
-		const tagsService = await this.moduleRef.resolve(TagsService, contextId);
-		console.log(tagsService);
-		const tagsServices = await Promise.all([
-			this.moduleRef.resolve(TagsService, contextId),
-			this.moduleRef.resolve(TagsService, contextId),
-		]);
-		console.log(tagsServices[0] === tagsServices[1]);
+		// const contextId = ContextIdFactory.create();
+		// this.moduleRef.registerRequestByContextId({ hello: 'world' }, contextId);
+		// const tagsService = await this.moduleRef.resolve(TagsService, contextId);
+		// console.log(tagsService);
+		// const tagsServices = await Promise.all([
+		// 	this.moduleRef.resolve(TagsService, contextId),
+		// 	this.moduleRef.resolve(TagsService, contextId),
+		// ]);
+		// console.log(tagsServices[0] === tagsServices[1]);
 	}
 }
