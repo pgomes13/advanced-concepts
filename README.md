@@ -1,98 +1,74 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# NestJS Advanced Concepts
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+A NestJS project exploring advanced framework concepts through practical implementations.
 
 ## Project setup
 
 ```bash
-$ pnpm install
+pnpm install
 ```
 
 ## Compile and run the project
 
 ```bash
 # development
-$ pnpm run start
+pnpm run start
 
 # watch mode
-$ pnpm run start:dev
+pnpm run start:dev
 
 # production mode
-$ pnpm run start:prod
+pnpm run start:prod
 ```
 
 ## Run tests
 
 ```bash
 # unit tests
-$ pnpm run test
+pnpm run test
 
 # e2e tests
-$ pnpm run test:e2e
+pnpm run test:e2e
 
 # test coverage
-$ pnpm run test:cov
+pnpm run test:cov
 ```
 
-## Deployment
+## Concepts covered
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+### Dynamic Modules (`HttpClientModule`)
+`HttpClientModule` is built with `ConfigurableModuleBuilder`, supporting both sync (`register`) and async (`registerAsync`) configuration. Accepts a `baseUrl` option and an `isGlobal` extra that controls whether the module is registered globally.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### DI Sub-trees — Multi-tenancy
+`AggregateByTenantContextIdStrategy` implements `ContextIdStrategy` to create a separate DI sub-tree per tenant. The tenant is resolved from the `x-tenant-id` request header. Durable providers share one instance per tenant; non-durable providers remain per-request.
 
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
+### DI Sub-trees — i18n / Locale
+`AggregateByLocaleContextIdStrategy` implements the same pattern for locale. The locale is resolved from the `Accept-Language` header using `accept-language-parser`. Durable providers share one instance per locale code.
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+### Worker Threads (`FibonacciModule`)
+`FibonacciWorkerHost` offloads CPU-intensive Fibonacci computation to a dedicated `worker_thread`. Communication uses `postMessage` / `fromEvent` (RxJS) with unique request IDs so concurrent calls are correlated correctly.
 
-## Resources
+### Custom Scheduler
+A metadata-driven interval scheduler built on top of `DiscoveryService` and `MetadataScanner`:
+- `@IntervalHost` — marks a class as a source of scheduled methods.
+- `@Interval(ms)` — marks a method to be called on the given interval.
+- `IntervalScheduler` scans all providers at bootstrap, reads the metadata, and registers `setInterval` calls. All intervals are cleared on shutdown.
+- `CronService` demonstrates usage by logging every second.
 
-Check out a few resources that may come in handy when working with NestJS:
+### Event-Driven Architecture (`PaymentsModule`)
+`PaymentsWebhookController` emits a `PaymentFailedEvent` via `EventEmitter2`, passing a manually created `ContextId` so that request-scoped services (`NotificationsService`, `SubscriptionsService`) can be resolved within the event handler without an HTTP request context.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### Circuit Breaker Interceptor
+`CircuitBreakerInterceptor` maintains a `WeakMap` of `CircuitBreaker` instances keyed by route handler. Each handler gets its own circuit breaker, providing per-endpoint failure isolation.
 
-## Support
+### `EntityExistsPipe` factory
+A generic pipe factory: `EntityExistsPipe(EntityClass)` returns a DI-injectable pipe that validates whether a given ID exists in the repository before the handler executes.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+### `WithUuid` mixin
+`WithUuid<TBase>` is a class mixin that adds a `uuid` property (auto-generated) and a `regenerateUuid()` method to any base class.
 
-## Stay in touch
+### Lazy-loaded modules (`RewardsModule`)
+`RewardsService` demonstrates lazy module loading — the module is loaded on demand rather than at bootstrap.
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+### Durable providers (`DataSourceModule`)
+`DataSourceService` is exported for use as a durable, request-scoped provider. Durable providers are instantiated once per DI sub-tree (e.g., per tenant or per locale) rather than once per request.
